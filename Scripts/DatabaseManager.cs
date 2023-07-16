@@ -1,52 +1,50 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using System.Data;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 public class DatabaseManager : MonoBehaviour
 {
-    private string connectionString = "Server=DESKTOP-12VE4CU;Database=Monster;Integrated Security=true;";
+    // Modify the connection string based on your database configuration
+    private string connectionString = "server=127.0.0.1;port=3306;database=monsterslayer;uid=root;password=Niles2012!;";
 
-    public void RetrieveClassData(string selectedClass)
+    private MySqlConnection connection;
+
+    private void Awake()
     {
-        SqlConnection connection = new SqlConnection(connectionString);
+        connection = new MySqlConnection(connectionString);
+    }
 
+    private void Start()
+    {
+        ConnectToDatabase();
+    }
+
+    private void ConnectToDatabase()
+    {
         try
         {
             connection.Open();
-            Debug.Log("Connection successful!");
-
-            // Execute a SQL query to retrieve class-specific data
-            string query = "SELECT * FROM " + selectedClass;
-            SqlCommand command = new SqlCommand(query, connection);
-            SqlDataReader reader = command.ExecuteReader();
-
-            // Process the retrieved data
-            while (reader.Read())
-            {
-                // Access the data fields
-                int player_id = reader.GetInt32(0);
-                string player_name = reader.GetString(1);
-                int player_attack = reader.GetInt32(2);
-                int player_def = reader.GetInt32(3);
-                int player_spec = reader.GetInt32(4);
-                int player_hp = reader.GetInt32(5);
-                int weapon_id = reader.GetInt32(6);
-                int armor_id = reader.GetInt32(7);
-                // Retrieve other class-specific fields as needed
-
-                // Process the retrieved data here
-                Debug.Log("ID: " + player_id + ", Name: " + player_name + ", Attack: " + player_attack + ", Defense: " + player_def + ", Special: " + player_spec + ", Health: " + player_hp + ", Weapon: " + weapon_id + ", Armor: " + armor_id);
-            }
-
-            reader.Close();
+            Debug.Log("Connected to the database!");
         }
-        catch (SqlException ex)
+        catch (MySqlException e)
         {
-            Debug.Log("Error connecting to the database: " + ex.Message);
-        }
-        finally
-        {
-            connection.Close();
+            Debug.LogError("Failed to connect to the database: " + e.Message);
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        connection.Close();
+        Debug.Log("Disconnected from the database.");
+    }
+
+    public void RetrieveClassData(string selectedClass)
+    {
+        // Use the selectedClass variable to retrieve class data from the database
+        // You can execute SQL queries here to fetch the necessary data
+        // Implement the logic to handle the retrieved data as per your game's requirements
+        Debug.Log("Retrieving data for class: " + selectedClass);
+    }
+
 }
